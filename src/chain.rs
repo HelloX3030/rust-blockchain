@@ -14,8 +14,8 @@ pub struct Chain {
 
 impl Chain {
     pub fn new() -> Self {
-        let mut chain = Chain { blocks: Vec::with_capacity(10_000), mempool: Vec::with_capacity(1_000), next_index: 0 };
-        chain.blocks.push(Block::new_genesis());
+        let mut chain = Chain { blocks: Vec::with_capacity(10_000), mempool: Vec::with_capacity(1_000), next_index: 1 };
+        chain.blocks.push(Block::new_genesis()); 
         return chain;
     }
     
@@ -50,7 +50,23 @@ impl Chain {
             let tx_count = std::cmp::min(TRANSACTIONS_PER_BLOCK, self.mempool.len());
             let handle_transactions: Vec<Transaction> = self.mempool[..tx_count].to_vec();
             let previous_hash = self.blocks.last().ok_or_else(|| anyhow!("Blockchain is empty"))?.hash.clone();
-            self.blocks.push(Block::new(self.next_index, previous_hash, handle_transactions));
+            let mut block = Block::new(self.next_index, previous_hash, handle_transactions);
+            self.next_index += 1;
+            block.mine().expect("Failed to mine block");
+            println!("Mined block {:?}", block);
+            self.blocks.push(block);
+        }
+        Ok(())
+    }
+
+    pub fn add_example_transactions(&mut self, amount: u64) -> Result<()> {
+        for i in 0..amount {
+            let tx = Transaction {
+                sender: format!("sender_{}", i),
+                recipient: format!("recipient_{}", i),
+                amount: (i + 1) as f64 * 10.0,
+            };
+            self.mempool.push(tx);
         }
         Ok(())
     }

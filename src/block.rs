@@ -26,16 +26,17 @@ impl Block {
         let mut block = Block {
             index: 0,
             timestamp: 0,
-            transactions: Vec::new(),
+            transactions: vec![Transaction::default(); 10],
             previous_hash: "0".to_string(),
             nonce: 0,
             hash: String::new(),
         };
+        block.mine().expect("Failed to mine genesis block");
         block
     }
 
     pub fn new(index: u64, previous_hash: String, transactions: Vec<Transaction>) -> Self {
-        let mut block = Block {
+        let block = Block {
             index,
             timestamp: 0,
             transactions,
