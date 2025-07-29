@@ -1,18 +1,20 @@
 use std::path;
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use std::fs::File;
 use serde::{Deserialize, Serialize};
-
-use crate::block::Block;
+use crate::transaction::Transaction;
+use crate::block::{Block, TRANSACTIONS_PER_BLOCK};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Chain {
     pub blocks: Vec<Block>,
+    pub mempool: Vec<Transaction>,
+    pub next_index: u64,
 }
 
 impl Chain {
     pub fn new() -> Self {
-        let mut chain = Chain { blocks: Vec::with_capacity(10_000) };
+        let mut chain = Chain { blocks: Vec::with_capacity(10_000), mempool: Vec::with_capacity(1_000), next_index: 0 };
         chain.blocks.push(Block::new_genesis());
         return chain;
     }
@@ -43,8 +45,13 @@ impl Chain {
         Some(chain)
     }
 
-    // TODO: add block
-    //  - accepts a block
-    //  - validates the block
-    //  - adds the block to the chain
+    pub fn mine(&mut self) -> Result<()> {
+        while !self.mempool.is_empty(){
+            let tx_count = std::cmp::min(TRANSACTIONS_PER_BLOCK, self.mempool.len());
+            let handle_transactions: Vec<Transaction> = self.mempool[..tx_count].to_vec();
+            let previous_hash = self.blocks.last().ok_or_else(|| anyhow!("Blockchain is empty"))?.hash.clone();
+            self.blocks.push(Block::new(self.next_index, previous_hash, handle_transactions));
+        }
+        Ok(())
+    }
 }

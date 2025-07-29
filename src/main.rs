@@ -11,4 +11,5 @@ fn main() {
     }
     println!("{:?}", chain);
     chain.store("chain.json").expect("Failed to store chain");
+    chain.mine().expect("Failed to mine block");
 }
