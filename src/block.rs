@@ -1,22 +1,10 @@
 use serde::{Deserialize, Serialize};
-
+use borsh::{BorshDeserialize, BorshSerialize, to_vec};
+use sha2::{Sha256, Digest};
 use crate::transaction::Transaction;
 
 /// Represents a single block in the blockchain.
-///
-/// Each block contains a list of transactions and links to the previous block via its hash.
-/// It also includes a nonce used for proof-of-work mining and the block's own hash for integrity.
-///
-/// # Fields
-///
-/// - `index`: The position of the block in the blockchain (starting from 0 for the genesis block).
-/// - `timestamp`: The time when the block was created, represented as UNIX epoch seconds.
-/// - `transactions`: A list of transactions included in this block.
-/// - `previous_hash`: The hash of the previous block in the chain, ensuring immutability and order.
-/// - `nonce`: A number adjusted by miners to find a hash that satisfies the proof-of-work difficulty.
-/// - `hash`: The cryptographic hash of this block, calculated over its contents including the nonce.
-
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize, Clone)]
 pub struct Block {
     pub index: u64,
     pub timestamp: u64,
@@ -27,18 +15,33 @@ pub struct Block {
 }
 
 impl Block {
-    // TODO: new
-    // TODO: hash
-    // TODO: new_genesis
+    /// Creates the genesis (first) block in the blockchain.
     pub fn new_genesis() -> Self {
-        Block {
+        let mut block = Block {
             index: 0,
             timestamp: 0,
             transactions: Vec::new(),
-            previous_hash: String::from("0"),
+            previous_hash: "0".to_string(),
             nonce: 0,
-            hash: String::from("genesis_hash"),
-        }
+            hash: String::new(),
+        };
+        block.update_hash();
+        block
     }
-    // TODO: print 
+
+    /// Calculates the hash of the block by serializing its data (excluding `hash`)
+    /// and passing it through SHA256.
+    pub fn calculate_hash(&self) -> String {
+        let mut block_copy = self.clone();
+        block_copy.hash = String::new(); // Exclude the hash field
+
+        let bytes = to_vec(&block_copy).expect("Failed to serialize block for hashing");
+        let hash = Sha256::digest(&bytes);
+        format!("{:x}", hash)
+    }
+
+    /// Updates the block's hash field using its current contents.
+    pub fn update_hash(&mut self) {
+        self.hash = self.calculate_hash();
+    }
 }
