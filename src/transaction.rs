@@ -1,3 +1,5 @@
+
+#[derive(Debug)]
 pub struct Transaction {
     sender: String,
     recipient: String,

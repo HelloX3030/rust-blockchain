@@ -13,7 +13,8 @@ use crate::transaction::Transaction;
 /// - `previous_hash`: The hash of the previous block in the chain, ensuring immutability and order.
 /// - `nonce`: A number adjusted by miners to find a hash that satisfies the proof-of-work difficulty.
 /// - `hash`: The cryptographic hash of this block, calculated over its contents including the nonce.
-/// 
+
+#[derive(Debug)]
 pub struct Block {
     pub index: u64,
     pub timestamp: u64,
@@ -27,6 +28,15 @@ impl Block {
     // TODO: new
     // TODO: hash
     // TODO: new_genesis
-    // TODO: add block
+    pub fn new_genesis() -> Self {
+        Block {
+            index: 0,
+            timestamp: 0,
+            transactions: Vec::new(),
+            previous_hash: String::from("0"),
+            nonce: 0,
+            hash: String::from("genesis_hash"),
+        }
+    }
     // TODO: print 
 }
