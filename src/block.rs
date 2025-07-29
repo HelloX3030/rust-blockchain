@@ -22,3 +22,11 @@ pub struct Block {
     pub nonce: u64,
     pub hash: String,
 }
+
+impl Block {
+    // TODO: new
+    // TODO: hash
+    // TODO: new_genesis
+    // TODO: add block
+    // TODO: print 
+}

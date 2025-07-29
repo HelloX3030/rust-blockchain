@@ -4,3 +4,6 @@ pub struct Chain {
     pub blocks: Vec<Block>,
 }
 
+impl Chain {
+    // TODO: store 
+}
