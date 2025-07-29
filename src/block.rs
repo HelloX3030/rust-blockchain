@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use crate::transaction::Transaction;
 
 /// Represents a single block in the blockchain.
@@ -14,7 +16,7 @@ use crate::transaction::Transaction;
 /// - `nonce`: A number adjusted by miners to find a hash that satisfies the proof-of-work difficulty.
 /// - `hash`: The cryptographic hash of this block, calculated over its contents including the nonce.
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Block {
     pub index: u64,
     pub timestamp: u64,
