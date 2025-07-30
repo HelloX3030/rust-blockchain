@@ -48,7 +48,7 @@ impl Chain {
     pub fn mine(&mut self) -> Result<()> {
         while !self.mempool.is_empty(){
             let tx_count = std::cmp::min(TRANSACTIONS_PER_BLOCK, self.mempool.len());
-            let handle_transactions: Vec<Transaction> = self.mempool[..tx_count].to_vec();
+            let handle_transactions: Vec<Transaction> = self.mempool.drain(..tx_count).collect();
             let previous_hash = self.blocks.last().ok_or_else(|| anyhow!("Blockchain is empty"))?.hash.clone();
             let mut block = Block::new(self.next_index, previous_hash, handle_transactions);
             self.next_index += 1;
